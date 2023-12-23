@@ -1,0 +1,1 @@
+jalankan di vscode dan tulis di terminal= py app.py

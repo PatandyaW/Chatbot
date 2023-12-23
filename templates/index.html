@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cobaindeh</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+
+      .chat-container {
+        max-width: 400px;
+        margin: 20px auto;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .chat-header {
+        background-color: #333;
+        color: #fff;
+        padding: 10px;
+        text-align: center;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+      }
+
+      .chat-box {
+        height: 300px;
+        overflow-y: scroll;
+        padding: 10px;
+      }
+
+      .message-container {
+        margin-bottom: 10px;
+      }
+
+      .user-message {
+        background-color: #e2f7cb;
+        padding: 8px;
+        border-radius: 8px;
+        align-self: flex-end;
+      }
+
+      .bot-message {
+        background-color: #f0f0f0;
+        padding: 8px;
+        border-radius: 8px;
+        align-self: flex-start;
+      }
+
+      .user-input {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+      }
+
+      #userInput {
+        flex: 1;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        margin-right: 10px;
+      }
+
+      input[type="submit"] {
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        background-color: #333;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      input[type="submit"]:hover {
+        background-color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-header">
+        <h2>Cobaindeh</h2>
+      </div>
+      <div class="chat-box" id="chatbox"></div>
+      <form id="chatForm" class="user-input" onsubmit="submitForm(event)">
+        <input type="text" id="userInput" placeholder="Type a message..." />
+        <input type="submit" value="Send" />
+      </form>
+    </div>
+
+    <script>
+      function appendMessage(message, isUser) {
+        const chatbox = document.getElementById("chatbox");
+        const messageContainer = document.createElement("div");
+        const messageElement = document.createElement("span");
+        messageElement.textContent = message;
+        messageContainer.classList.add("message-container");
+
+        if (isUser) {
+          messageContainer.classList.add("user-message");
+        } else {
+          messageContainer.classList.add("bot-message");
+        }
+
+        messageContainer.appendChild(messageElement);
+        chatbox.appendChild(messageContainer);
+        chatbox.scrollTop = chatbox.scrollHeight; // Auto-scroll to bottom
+      }
+
+      function submitForm(event) {
+        event.preventDefault();
+        const userInput = document.getElementById("userInput").value;
+        appendMessage("You: " + userInput, true);
+
+        fetch("/get_response", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: "user_input=" + encodeURIComponent(userInput),
+        })
+          .then((response) => response.text())
+          .then((data) => {
+            appendMessage("Tiko: " + data, false);
+          });
+
+        document.getElementById("userInput").value = "";
+      }
+    </script>
+  </body>
+</html>
